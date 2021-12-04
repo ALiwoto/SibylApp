@@ -1,0 +1,28 @@
+# EditorConfig is awesome: http://editorconfig.org
+root = true
+
+[*.{csproj,props,targets}]
+charset = utf-8-bom
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+
+[*.dart]
+end_of_line = lf
+insert_final_newline = true
+indent_style = tab
+indent_size = 4
+trim_trailing_whitespace = true
+
+#license header
+#file_header_template = 
+
+#Roslyn naming styles
+
+[*.{yaml,yml}]
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
