@@ -13,7 +13,7 @@ class SibylResponse<T extends SibylResultable> {
 	static SibylResponse fromJson<T extends SibylResultable>(final Map<String, dynamic> value) {
 		return SibylResponse(
 			value['success'] as bool,
-			SibylResultable.fromJson(value['result']),
+			SibylResultable.fromJson<T>(value['result']),
 			SibylError.fromJson(value['error']),
 		);
 	}

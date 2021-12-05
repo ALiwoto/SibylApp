@@ -1,6 +1,17 @@
 {
-    "cSpell.words": [
-        "Cupertino",
-        "Schyler"
-    ]
+	"cSpell.words": [
+		"Cupertino",
+		"Schyler"
+	],
+	"dart.analysisServerFolding": true,
+	"editor.autoIndent": "full",
+	"editor.detectIndentation": true,
+	"editor.insertSpaces": false,
+	"editor.tabSize": 4,
+	"[dart]": {
+		"editor.tabSize": 4,
+		"editor.insertSpaces": false,
+		"editor.detectIndentation": false,
+		"editor.suggest.insertMode": "replace"
+	},
 }

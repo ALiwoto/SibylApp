@@ -18,11 +18,16 @@ class SibylHomePage extends StatefulWidget {
 
 	@override
 	_SibylHomePageState createState() => _SibylHomePageState();
+
+	
 }
 
 class _SibylHomePageState extends State<SibylHomePage> {
+	TextField? tokenTextField;
+	Text? loginTextLable;
+	String tokenInput = '';
 	//int _counter = 0;
-
+	/*
 	void _incrementCounter() {
 		setState(() {
 			// This call to setState tells the Flutter framework that something has
@@ -32,6 +37,62 @@ class _SibylHomePageState extends State<SibylHomePage> {
 			// called again, and so nothing would appear to happen.
 		 // _counter++;
 		});
+	}
+	*/
+	
+	void onLoginTokenButtonPressed() async {
+		if (tokenTextField == null) {
+			// make sure that our token textfield is already set.
+			return;
+		}
+
+		bool isValid = false;
+		
+
+		try {
+			var core = new SibylCore(tokenInput, null);
+			var result = await core.checkTokenAsync();
+			if (result != null && result.theValue) {
+				isValid = true;
+				//sibylClient = core;
+			}
+		} catch (ex) {
+			setState(() {
+				this.loginTextLable = new Text(
+					"Login token: ${ex.toString()}",
+					textAlign: TextAlign.left,
+					style: Theme.of(context).textTheme.headline5,
+				);
+			});
+			return;
+		}
+
+		if (isValid) {
+			setState(() {
+				this.loginTextLable = new Text(
+					"Login token: Done!",
+					textAlign: TextAlign.left,
+					style: Theme.of(context).textTheme.headline5,
+				);
+			});
+		} else {
+			setState(() {
+				this.loginTextLable = new Text(
+					"Login token: (invalid token)",
+					textAlign: TextAlign.left,
+					style: Theme.of(context).textTheme.headline5,
+				);
+			});
+		}
+	}
+
+	void onTokenInputChanged(String value) {
+		if (tokenTextField == null) {
+			// make sure that our token textfield is already set.
+			return;
+		}
+
+		tokenInput = value;
 	}
 
 	@override
@@ -49,15 +110,19 @@ class _SibylHomePageState extends State<SibylHomePage> {
 		// check if sibyl client is already initialized or not;
 		// if not, let the user enters their token.
 		if (sibylClient == null) {
-			return SibylFirstScaffold.buildFirstScaffold(context, widget);
+			return SibylFirstScaffold.buildFirstScaffold(context, widget, this);
 		}
 
-		return SibylFirstScaffold.buildFirstScaffold(context, widget);
+		return SibylFirstScaffold.buildFirstScaffold(context, widget, this);
 	}
 }
 
 class SibylFirstScaffold extends Scaffold {
-	SibylFirstScaffold(BuildContext context, SibylHomePage widget) : 
+	SibylFirstScaffold(
+		BuildContext context,
+		SibylHomePage widget,
+		_SibylHomePageState state,
+	) :
 	super(
 			appBar: AppBar(
 				// Here we take the value from the MyHomePage object that was created by
@@ -84,20 +149,11 @@ class SibylFirstScaffold extends Scaffold {
 					// horizontal).
 					mainAxisAlignment: MainAxisAlignment.center,
 					children: <Widget>[
-						Text(
-							'Welcome to Sibyl System!',
-							style: Theme.of(context).textTheme.headline4,
-						),
-						Text(
-							"Please enter your login token:",
-							style: Theme.of(context).textTheme.headline5,
-						),
-						TextField(
-							textDirection: TextDirection.ltr,
-							enableSuggestions: false,
-							style: Theme.of(context).textTheme.headline6,
-							textAlign: TextAlign.center,
-							autocorrect: false,
+						state.loginTextLable!,
+						state.tokenTextField!,
+						TextButton(
+							child: Text('Login'),
+							onPressed: state.onLoginTokenButtonPressed,
 						),
 					],
 				),
@@ -109,7 +165,26 @@ class SibylFirstScaffold extends Scaffold {
 			//), // This trailing comma makes auto-formatting nicer for build methods.
 		);
 
-	static SibylFirstScaffold buildFirstScaffold(BuildContext context, SibylHomePage widget) {
-		return SibylFirstScaffold(context, widget);
+	static SibylFirstScaffold buildFirstScaffold(
+		BuildContext context, 
+		SibylHomePage widget,
+		_SibylHomePageState state,
+	) {
+		if (state.tokenTextField == null) {
+			state.tokenTextField = new TextField(
+				textDirection: TextDirection.ltr,
+				enableSuggestions: false,
+				style: Theme.of(context).textTheme.headline6,
+				textAlign: TextAlign.center,
+				autocorrect: false,
+				onChanged: state.onTokenInputChanged,
+			);
+			state.loginTextLable = new Text(
+				"Login token:",
+				textAlign: TextAlign.left,
+				style: Theme.of(context).textTheme.headline5,
+			);
+		}
+		return SibylFirstScaffold(context, widget, state);
 	}
 }

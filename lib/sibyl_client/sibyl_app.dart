@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sibyl_app/sibyl_client/sibyl_theme/sibyl_themes.dart';
 import 'homepage/sibyl_homepage.dart';
 
 class SibylApp extends StatelessWidget {
@@ -11,15 +12,8 @@ class SibylApp extends StatelessWidget {
 class SibylMaterialApp extends MaterialApp {
 	SibylMaterialApp(this.sibylVersion) : super(
 			title: 'Sibyl System',
-			theme: ThemeData(
-				primarySwatch: Colors.green,
-				backgroundColor: Colors.black26,
-			),
-			darkTheme: ThemeData(
-				primarySwatch: Colors.blueGrey,
-				backgroundColor: Colors.black12,
-				secondaryHeaderColor: Colors.deepPurple,
-			),
+			theme: getSibylLightTheme(),
+			darkTheme: getSibylDarkTheme(),
 			home: SibylHomePage(title: 'Sibyl System'),
 		)
 	{
@@ -29,8 +23,4 @@ class SibylMaterialApp extends MaterialApp {
 	}
 
 	final String sibylVersion;
-
-//	SibylMaterialApp operator +(SibylMaterialApp other) {
-//		return null;
-//	}
 }

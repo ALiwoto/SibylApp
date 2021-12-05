@@ -12,7 +12,7 @@ import 'package:sibyl_app/core/sibyl_results.dart';
 SibylCore? sibylClient;
 
 class SibylCore {
-	static const String DefaultUrl = 'https://psychopass.animekaizoku.com';
+	static const String DefaultUrl = 'https://psychopass.animekaizoku.com/';
 
 	String token = '';
 	String _hostUrl = DefaultUrl;
@@ -106,46 +106,76 @@ class SibylCore {
 		this._hostUrl = DefaultUrl;
 	}
 
+	Uri getSuitableUri(String endpoint, Map<String, String> params) {
+		var theUri = Uri.parse(this._hostUrl + endpoint);
+		params.addAll(theUri.queryParameters);
+
+		return theUri.replace(
+			queryParameters: params,
+		);
+	}
+
 	String? getHostUrl() => this._hostUrl.toString();
 
 	// ban-related methods:
 
 
-	Future<String> banAsync(
+	Future<BanResult?> banAsync(
 		final int userId, 
 		final String reason,
 		final String message,
 		final String srcUrl,
 		final bool isBot,
 	) async {
-		var theUri = Uri.parse(this._hostUrl);
-		theUri.queryParameters.addAll({
-			'token': this.token,
-			'user-id': userId.toString(),
-			'reason': reason,
-			'message': message,
-			'src-url': srcUrl,
-			'is-bot': isBot.toString(),
-		});
+		var resp = await this.revokeAsync<BanResult>(
+			'addBan',
+			{
+				'token': this.token,
+				'user-id': userId.toString(),
+				'reason': reason,
+				'message': message,
+				'src-url': srcUrl,
+				'is-bot': isBot.toString(),
+			},
+		);
 
-		var req = await this._httpClient.getUrl(theUri);
-		var resp = await req.close();
-		var myStream = resp.transform(utf8.decoder);
-		String myData = '';
-		await myStream.listen((String contents) {
-			myData = contents;
-		}).asFuture();
+		if (resp.error != null) {
+			throw resp.error!;
+		}
 
-		return myData;
+		if (resp.result is BanResult) {
+			return resp.result! as BanResult;
+		}
+
+		return null;
 	}
+
+
+	Future<BanResult?> banUserAsync(
+		final int userId, 
+		final String reason,
+		final String message,
+		final String srcUrl,
+	) async => this.banAsync(userId, reason, message, srcUrl, false);
+
+	Future<BanResult?> banBotAsync(
+		final int userId, 
+		final String reason,
+		final String message,
+		final String srcUrl,
+	) async => this.banAsync(userId, reason, message, srcUrl, true);
+
 
 	Future<StringResult?> removeBanAsync(
 		final int userId, 
 	) async {
-		
-		var resp = await this.revokeAsync<StringResult>({
-			'user-id': userId.toString(),
-		});
+		var resp = await this.revokeAsync<StringResult>(
+			'removeBan',
+			{
+				'token': this.token,
+				'user-id': userId.toString(),
+			},
+		);
 
 		if (resp.error != null) {
 			throw resp.error!;
@@ -159,10 +189,31 @@ class SibylCore {
 	}
 
 	
+	Future<BoolResult?> checkTokenAsync() async {
+		var resp = await this.revokeAsync<BoolResult>(
+			'checkToken',
+			{
+				'token': this.token,
+			},
+		);
 
-	Future<SibylResponse> revokeAsync<T extends SibylResultable>(Map<String, String> params) async {
-		var theUri = Uri.parse(this._hostUrl);
-		theUri.queryParameters.addAll(params);
+		if (resp.error != null) {
+			throw resp.error!;
+		}
+
+		if (resp.result is BoolResult) {
+			return resp.result! as BoolResult;
+		}
+
+		return null;
+	}
+
+
+	Future<SibylResponse> revokeAsync<T extends SibylResultable>(
+			String endpoint,
+			Map<String, String> params,
+		) async {
+		var theUri = this.getSuitableUri(endpoint, params);
 
 		var req = await this._httpClient.getUrl(theUri);
 		var resp = await req.close();

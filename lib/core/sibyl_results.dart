@@ -4,6 +4,10 @@ abstract class SibylResultable {
 	const SibylResultable();
 
 	static SibylResultable? fromJson<T extends SibylResultable>(final dynamic value) {
+		if (value == null) {
+			return null;
+		}
+		
 		switch (T) {
 			case StringResult:
 				return StringResult.fromJson(value);
@@ -13,6 +17,8 @@ abstract class SibylResultable {
 				return BanResult.fromJson(value);
 			case GetInfoResult:
 				return GetInfoResult.fromJson(value);
+			case BoolResult:
+				return BoolResult.fromJson(value);
 		}
 		
 		return null;
@@ -48,6 +54,31 @@ class StringResult implements SibylResultable {
 		return null;
 	}
 }
+
+
+class BoolResult implements SibylResultable {
+	final bool theValue;
+
+	const BoolResult(this.theValue);
+
+	@override
+	String toString() => theValue.toString();
+
+	static BoolResult? fromJson(final dynamic value) {
+		if (value is bool) {
+			return new BoolResult(value);
+		}
+
+		if (value != null) {
+			var str = value.toString();
+			if (str.length > 0) {
+				return new BoolResult(value);
+			}
+		}
+		return null;
+	}
+}
+
 
 class BanInfo extends SibylResultable {
 	final int userId;
