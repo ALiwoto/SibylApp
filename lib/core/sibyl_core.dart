@@ -115,10 +115,9 @@ class SibylCore {
 		);
 	}
 
-	String? getHostUrl() => this._hostUrl.toString();
+	String? getHostUrl() => this._hostUrl;
 
 	// ban-related methods:
-
 
 	Future<BanResult?> banAsync(
 		final int userId, 
@@ -150,7 +149,6 @@ class SibylCore {
 		return null;
 	}
 
-
 	Future<BanResult?> banUserAsync(
 		final int userId, 
 		final String reason,
@@ -165,10 +163,7 @@ class SibylCore {
 		final String srcUrl,
 	) async => this.banAsync(userId, reason, message, srcUrl, true);
 
-
-	Future<StringResult?> removeBanAsync(
-		final int userId, 
-	) async {
+	Future<StringResult?> removeBanAsync(final int userId) async {
 		var resp = await this.revokeAsync<StringResult>(
 			'removeBan',
 			{
@@ -183,6 +178,46 @@ class SibylCore {
 
 		if (resp.result is StringResult) {
 			return resp.result! as StringResult;
+		}
+
+		return null;
+	}
+
+	Future<GetInfoResult?> getInfoAsync(final int userId) async {
+		var resp = await this.revokeAsync<GetInfoResult>(
+			'getInfo',
+			{
+				'token': this.token,
+				'user-id': userId.toString(),
+			},
+		);
+
+		if (resp.error != null) {
+			throw resp.error!;
+		}
+
+		if (resp.result is GetInfoResult) {
+			return resp.result! as GetInfoResult;
+		}
+
+		return null;
+	}
+
+	Future<GeneralInfoResult?> getGeneralAsync(final int userId) async {
+		var resp = await this.revokeAsync<GeneralInfoResult>(
+			'getGeneralInfo',
+			{
+				'token': this.token,
+				'user-id': userId.toString(),
+			},
+		);
+
+		if (resp.error != null) {
+			throw resp.error!;
+		}
+
+		if (resp.result is GeneralInfoResult) {
+			return resp.result! as GeneralInfoResult;
 		}
 
 		return null;

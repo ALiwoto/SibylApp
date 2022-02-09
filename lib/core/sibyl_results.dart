@@ -11,14 +11,18 @@ abstract class SibylResultable {
 		switch (T) {
 			case StringResult:
 				return StringResult.fromJson(value);
+			case BoolResult:
+				return BoolResult.fromJson(value);
 			case BanInfo:
 				return BanInfo.fromJson(value);
 			case BanResult:
 				return BanResult.fromJson(value);
 			case GetInfoResult:
 				return GetInfoResult.fromJson(value);
-			case BoolResult:
-				return BoolResult.fromJson(value);
+			case GeneralInfoResult:
+				return GeneralInfoResult.fromJson(value);
+			case GetBansResult:
+				return GetBansResult.fromJson(value);
 		}
 		
 		return null;
@@ -32,7 +36,7 @@ enum UserPermission {
 	Owner,
 }
 
-class StringResult implements SibylResultable {
+class StringResult extends SibylResultable {
 	final String theValue;
 
 	const StringResult(this.theValue);
@@ -55,8 +59,7 @@ class StringResult implements SibylResultable {
 	}
 }
 
-
-class BoolResult implements SibylResultable {
+class BoolResult extends SibylResultable {
 	final bool theValue;
 
 	const BoolResult(this.theValue);
@@ -78,7 +81,6 @@ class BoolResult implements SibylResultable {
 		return null;
 	}
 }
-
 
 class BanInfo extends SibylResultable {
 	final int userId;
@@ -239,7 +241,6 @@ class GetInfoResult extends SibylResultable {
 	}
 }
 
-
 class GeneralInfoResult extends SibylResultable {
 	final int userId;
 	final int division;
@@ -287,6 +288,40 @@ class GeneralInfoResult extends SibylResultable {
 	}
 }
 
+class GetBansResult extends SibylResultable {
 
+	final List<BanInfo>? users;
+
+	const GetBansResult({
+		this.users,
+	});
+
+	/**
+	 * Go declaration:
+		type BanResult struct {
+			PreviousBan *BanInfo `json:"previous_ban"`
+			CurrentBan  *BanInfo `json:"current_ban"`
+		}
+	 */
+
+
+	///
+	static GetBansResult? fromJson(final dynamic value) {
+		if (value is Map<String, dynamic>) {
+			if (value['users'] == null) return null;
+
+			var allUsers = List.of(value['users']);
+			return new GetBansResult(
+					users: List.generate(
+					allUsers.length, 
+					(index) =>	BanInfo.fromJson(allUsers[index])!,
+				),
+			);
+		}
+
+		return null;
+	}
+
+}
 
 
